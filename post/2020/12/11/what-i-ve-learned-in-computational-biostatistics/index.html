@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Katherine" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../../img/favicon.ico">
+    <title>What I&#39;ve Learned in Computational Biostatistics</title>
+    <meta name="generator" content="Hugo 0.79.0" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../../../../../css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="../../../../../"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="../../../../../post/">BLOG</a></li>
+        
+        <li><a href="../../../../../projects/">PROJECTS</a></li>
+        
+        <li><a href="../../../../../resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="../../../../../post/2020/12/11/what-i-ve-learned-in-computational-biostatistics/">What I&#39;ve Learned in Computational Biostatistics</a></strong>
+          </h3>
+        </div>
+ 
+<div class="blog-title">
+          <h4>
+         December 11, 2020 
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+
+<center>
+<img src="../../../../../post/2020-12-04-what-i-ve-learned-in-computational-biostatistics_files/python.png" style="width:60.0%" /> <img src="../../../../../post/2020-12-04-what-i-ve-learned-in-computational-biostatistics_files/Rlogo.svg" style="width:40.0%" />
+<center>
+<div id="hey-there" class="section level1">
+<h1>Hey There!</h1>
+<p>I've learned so much in my SDS348 course this year and wanted to share some of the things we worked on.</p>
+<div id="r-and-python-can-talk-to-each-other..." class="section level2">
+<h2>R and Python Can Talk to Each Other...</h2>
+<p>You can use reticulate to use Python within an R session and to share information across code chunks. Don't believe me? Check this out!</p>
+<p>This is an R code chunk. We're using an R code chunk, in an R session... nothing special to see here yet.</p>
+<pre class="r"><code>library(reticulate)
+
+FromR &lt;- &quot;I came from R!&quot;</code></pre>
+<p>Now, here's a Python chunk in an R session. The magic is about to begin!</p>
+<pre class="python"><code>print(r.FromR)</code></pre>
+<pre><code>## I came from R!</code></pre>
+<pre class="python"><code>FromPython = &quot;I came from Python!&quot;</code></pre>
+<p>As you can see, we've grabbed &quot;FromR&quot; from our R code chunk using a Python code chunk.</p>
+<p>But wait, there's more! We can also grab &quot;FromPython&quot; from our Python code chunk using our R code chunk:</p>
+<pre class="r"><code>py$FromPython </code></pre>
+<pre><code>## [1] &quot;I came from Python!&quot;</code></pre>
+<p>This is how R and Python talk to each other and how you can use Python interactively within an R session.</p>
+</div>
+<div id="how-about-an-example" class="section level2">
+<h2>How About an Example?</h2>
+<p>Christmas is coming, and it's time to start your gift shopping. You want to go big this year and surprise your best friend with some <em>(drum roll please)</em> diamond jewelry! You're not quite sure what type of diamond to get them, so you want to look into price ranges for different types. This is a huge expense, and you want to save as much money as you can while still earning the title of 'Best Gift Giver and Best Friend'.</p>
+<p>Let's take a look at some information about diamonds:</p>
+<pre class="python"><code>import seaborn as sns
+
+sparkle=sns.load_dataset(&#39;diamonds&#39;)
+
+sparkle.head()</code></pre>
+<pre><code>##    carat      cut color clarity  depth  table  price     x     y     z
+## 0   0.23    Ideal     E     SI2   61.5   55.0    326  3.95  3.98  2.43
+## 1   0.21  Premium     E     SI1   59.8   61.0    326  3.89  3.84  2.31
+## 2   0.23     Good     E     VS1   56.9   65.0    327  4.05  4.07  2.31
+## 3   0.29  Premium     I     VS2   62.4   58.0    334  4.20  4.23  2.63
+## 4   0.31     Good     J     SI2   63.3   58.0    335  4.34  4.35  2.75</code></pre>
+<p>You want to visualize the price of the diamonds depending on their carat and depth to help you decide.</p>
+<pre class="r"><code>library(ggplot2)
+
+sparkle&lt;-py$sparkle
+qplot(sparkle$price, sparkle$carat) </code></pre>
+<p><img src="../../../../../post/2020-12-04-what-i-ve-learned-in-computational-biostatistics_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>qplot(sparkle$price, sparkle$depth)</code></pre>
+<p><img src="../../../../../post/2020-12-04-what-i-ve-learned-in-computational-biostatistics_files/figure-html/unnamed-chunk-5-2.png" width="672" /> After looking through the data, you see that every price range of diamonds have a similar range of depths. You see that with an increase in price comes an increase in the carats, so you decide to go with something in the middle: a diamond with two carats. Your search is done, and you can now claim the title of Best Gift Giver and Best Friend. You're welcome!</p>
+</div>
+</div>
+
+            
+        <hr>         <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div> 
+            </div>
+          </div>
+
+   <hr>  <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div> 
+        </div>
+      </div>
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="../../../../../js/docs.min.js"></script>
+<script src="../../../../../js/main.js"></script>
+
+<script src="../../../../../js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

@@ -1,0 +1,66 @@
+---
+title: What I've Learned in Computational Biostatistics
+author: ''
+date: '2020-12-11'
+slug: what-i-ve-learned-in-computational-biostatistics
+categories: []
+tags: []
+description: ''
+---
+
+<center>
+![](/post/2020-12-04-what-i-ve-learned-in-computational-biostatistics_files/python.png){width=60%}
+![](/post/2020-12-04-what-i-ve-learned-in-computational-biostatistics_files/Rlogo.svg){width=40%}
+<center>
+
+#Hey There!
+I've learned so much in my SDS348 course this year and wanted to share some of the things we worked on.
+
+##R and Python Can Talk to Each Other...
+You can use reticulate to use Python within an R session and to share information across code chunks. Don't believe me? Check this out!
+
+
+This is an R code chunk. We're using an R code chunk, in an R session... nothing special to see here yet.
+```{R}
+library(reticulate)
+
+FromR <- "I came from R!"
+```
+
+Now, here's a Python chunk in an R session. The magic is about to begin!
+```{python}
+print(r.FromR)
+
+FromPython = "I came from Python!"
+```
+As you can see, we've grabbed "FromR" from our R code chunk using a Python code chunk. 
+
+But wait, there's more! We can also grab "FromPython" from our Python code chunk using our R code chunk:
+```{R}
+py$FromPython 
+```
+This is how R and Python talk to each other and how you can use Python interactively within an R session.
+
+
+##How About an Example?
+Christmas is coming, and it's time to start your gift shopping. You want to go big this year and surprise your best friend with some *(drum roll please)* diamond jewelry! You're not quite sure what type of diamond to get them, so you want to look into price ranges for different types. This is a huge expense, and you want to save as much money as you can while still earning the title of 'Best Gift Giver and Best Friend'.
+
+Let's take a look at some information about diamonds:
+```{python}
+import seaborn as sns
+
+sparkle=sns.load_dataset('diamonds')
+
+sparkle.head()
+```
+
+You want to visualize the price of the diamonds depending on their carat and depth to help you decide.
+```{r}
+library(ggplot2)
+
+sparkle<-py$sparkle
+qplot(sparkle$price, sparkle$carat) 
+
+qplot(sparkle$price, sparkle$depth)
+```
+After looking through the data, you see that every price range of diamonds have a similar range of depths. You see that with an increase in price comes an increase in the carats, so you decide to go with something in the middle: a diamond with two carats. Your search is done, and you can now claim the title of Best Gift Giver and Best Friend. You're welcome!

@@ -1,0 +1,186 @@
+---
+title: 'Project 1: Exploratory Data Analysis'
+author: "Katherine Shei; kjs3639"
+date: "2020-12-11"
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: no
+  pdf_document:
+    toc: yes
+  word_document:
+    toc: yes
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", warning = F, message = F,
+tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
+```
+
+#Introduction
+  I chose datasets 'bad_drivers' and 'SAT' to explore potential associations between driving abilities and intelligence. Do states with lower SAT scores have worse drivers? That's what I'm going to find out! Dataset 'bad_drivers' contains variables 'state,' 'num_drivers' (number of drivers involved in fatal collisions per billion miles), 'perc_speeding' (percentage of drivers involved in fatal collisions who were speeding), 'perc_alcohol' (percentage of drivers involved in fatal collisions who were alcohol-impaired), 'perc_not_distracted' (percentage of drivers involved in fatal collisions who were not distracted), 'perc_no_previous' (percentage of drivers involved in fatal collisions who had not been involved in any previous accidents), 'insurance_premiums' (car insurance premiums (dollars)), and 'losses' (losses incurred by insurance companies for collisions per insured driver (dollars)). Dataset 'SAT' has variables 'state,' 'expend' (expenditure per pupil in average daily attendance in public elementary and secondary schools, 1994-95 (in thousands of US dollars), 'ratio' (average pupil/teacher ratio in public elementary and secondary schools, Fall 1994), 'salary' (estimated average annual salary of teachers in public elementary and secondary schools, 1994-95 (in thousands of US dollars), 'frac' (percentage of all eligible students taking the SAT, 1994-95), 'verbal' (average verbal SAT score, 1994-95), 'math' (average math SAT score, 1994-95), and 'sat' (average total SAT score, 1994-95). Datasets 'bad_drivers' and 'SAT' were acquired through the R packages "fivethirtyeight" and "mosaicData," respectively. 
+ 
+  I thought these two datasets would be fun and interesting to join to see if there are any potential associations between each states' average SAT scores/education quality and their quality of drivers. Perhaps higher intelligence and better educational upbringing influence driving ability and decision making. For example, maybe states with higher SAT scoreshave a lower percentage of fatal collisions caused by speeding or alcohol-impairment because having a solid educational upbringing as students reflects upon their smart decision making as drivers. On the other hand, maybe states with lower SAT scores will have a lower percentage of fatal collisions from drivers who were not distracted or have had no previous accidents. Whether or not there is an association between driving skills and SAT scores will be interesting to explore!
+
+---
+
+#Datasets
+```{r}
+library(tidyverse)
+
+install.packages('fivethirtyeightdata', repos =
+'https://fivethirtyeightdata.github.io/drat/', type = 'source')
+library(fivethirtyeight)
+glimpse(bad_drivers) 
+
+library(mosaicData)
+glimpse(SAT)
+
+drivers <- bad_drivers
+SAT <- SAT
+```
+
+#Tidying
+```{r}
+#The datasets were already tidy, but I untidied and retidied them
+drivers %>% pivot_wider(names_from="insurance_premiums", values_from="losses") %>% pivot_longer(cols=-c(1:6), names_to="insurance_premiums", values_to="losses", values_drop_na=T) %>% glimpse()
+
+SAT %>% pivot_wider(names_from="verbal", values_from="math") %>% pivot_longer(cols=-c(1:6), names_to="verbal", values_to="math", values_drop_na=T) %>% glimpse()
+```
+
+  Both datasets were already tidy, so I untidied some columns and retidied them. With the 'drivers' dataset, I used 'pivot_wider()' to untidy the columns 'insurance_premiums' and 'losses,' then I used 'pivot_longer()' to retidy the dataset back to its original columns. With the 'SAT' dataset, I used 'pivot_wider()' to untidy the columns 'verbal' and 'math,' then I used 'pivot_longer()' to retidy them. I use these functions again in the Wrangling portion of the assignment as well.
+
+---
+
+#Joining/Merging
+```{r}
+drivers %>% dim()
+SAT %>% dim()
+drivers_sat <- drivers %>% inner_join(SAT)
+```
+
+  I did an inner join of the two datasets. There were 51 observations in the 'drivers' dataset and 50 observations in the 'SAT' dataset. One of the observations was dropped (the state "District of Columbia") from the 'drivers' dataset because 'SAT' did not have this state in its dataset. I chose this join because I want to see if there are associations between SAT scores and driving ability per state, so I need data from both datasets per each state in order to be able to compare them. Since District of Columbia is not in the SAT dataset, I do not want it in my joined data since there is nothing to compare this state to. I do not see any potential problems with dropping this observation.
+
+---
+
+#Wrangling (and Tidying)
+```{r}
+library(dplyr)
+
+#Creating 2 categorical variables
+drivers_sat_cat <- drivers_sat %>% mutate(rank = case_when(sat>1000 ~ "high", sat<=1000 & 900<=sat ~ "med", sat<900 ~ "low"))
+
+drivers_sat_cat <- drivers_sat_cat %>% mutate(driving = case_when(perc_no_previous>90 ~ "good", perc_no_previous<=90 & 80<=perc_no_previous ~ "okay", perc_no_previous<80 ~ "bad"))
+
+#Summary statistics for numeric variables
+sum_stat_num <- drivers_sat_cat %>% summarize_if(is.numeric, list(mean=mean, median=median, sd=sd, var=var, quantile=quantile)) %>% pivot_longer(contains("_"), names_to="variable", values_to="values") %>% mutate(variable=str_replace(variable, "_mean", ".mean")) %>%  mutate(variable=str_replace(variable, "_median", ".median")) %>%  mutate(variable=str_replace(variable, "_sd", ".sd")) %>%  mutate(variable=str_replace(variable, "_quantile", ".quantile")) %>%  mutate(variable=str_replace(variable, "_var", ".var")) %>% separate(variable, sep="\\.", into=c("variable", "stat")) %>% distinct(values, .keep_all = TRUE) %>% pivot_wider(names_from="stat", values_from="values")
+
+glimpse(sum_stat_num)
+
+#Summary statistics grouped by categorical variables
+sum_stat_group <- drivers_sat_cat %>% group_by(rank, driving) %>% filter(driving=='good') %>% select(expend, frac, verbal, math, sat) %>% summarize_if(is.numeric, list(mean=mean, median=median, min=min, max=max, distinct=n_distinct)) %>% pivot_longer(contains("_"), names_to="stats", values_to="values") %>% separate(stats, c("category", "stat")) %>% pivot_wider(names_from="stat", values_from="values") %>% arrange(mean)
+
+glimpse(sum_stat_group)
+
+#Correlation matrix of numeric variables
+stat_cor <- drivers_sat_cat %>% na.omit %>% select_if(is.numeric) 
+cor(stat_cor) %>% head(n=3)
+```
+
+  I created categorical variables in the joined dataset to create SAT rankings of 'high,' 'med,' and 'low' based on SAT score ranges and to create driving designations of 'good,' 'okay,' and 'bad' based on 'perc_no_previous' using 'mutate().' The first summary statistic shows the mean, median, standard deviation, quantile, and variation for all the numeric variables in the joined dataset per state. These statistics show that the mean and median of each of the variables are relatively close together. For example, the mean of 'num_drivers' is 15.988 and the median is 15.65. The mean of 'ratio' is 16.858 and its median is 16.6. This could indicate that there are not extreme outliers in the data since the mean is not skewed too far away from the median. These statistics also show that the values for variables 'insurance_premiums' and 'sat' are relatively spread out with a standard deviation of 171.236 and 74.821, respectively. The values for variables 'expend' and 'ratio' are not as far from the mean with a standard deviation of 1.363 and 2.266, respectively. An interesting variable to look at for 'quantile' is 'sat,' showing that 0% is a score of 844, 25% is a score of 897.25, 75% is a score of 1032, and 100% is a score of 1107. 
+
+  The second summary statistics show the mean, median, minimum, maximum, and distinct values of the dataset when grouped by 'rank' and 'driving,' filtering by just the 'good' drivers, and selecting only the variables 'expend', 'frac', 'verbal', 'math', and 'sat.' These statistics show that the mean 'sat' score of good drivers with a 'high' ranking sat score is 1032.571, the mean 'sat' score of good drivers with a 'med' ranking score is 937.714, and the mean 'sat' score of good drivers with a 'low' ranking score is 880.500. The minimum and maximum scores for the 'high' ranking good drivers are 1005 and 1076, respectively. For 'med' ranking good drivers they are 901 and 980. For the 'low' ranking good drivers they are 854 and 897. The medians for each variable are relatively close to the mean values. A correlation matrix was made with all the numeric variables in the dataset, with the highest correlations being between variables 'math,' 'verbal,' and 'sat,' and the lowest correlations being 'perc_no_previous' and 'perc_speeding.'
+
+---
+
+#Visualizing
+```{r}
+#Correlation Heatmap
+stat_cor <- drivers_sat_cat %>% na.omit %>% select_if(is.numeric) 
+cor <- stat_cor %>% cor
+
+cor_map <- cor %>% as.data.frame %>% rownames_to_column("var1")%>%
+pivot_longer(-1, names_to="var2", values_to="correlation")
+
+cor_map %>% ggplot(aes(var1, var2, fill=correlation)) + geom_tile()+ 
+scale_fill_gradient2(low="yellow",mid="orange",high="red")+ 
+geom_text(aes(label=round(correlation,2)),color = "black", size = 2)+
+theme(axis.text.x = element_text(angle = 90, hjust = 1))+ 
+coord_fixed()
+
+#Plot 1
+drivers_sat_cat %>% mutate(rank=factor(rank, levels=c("low", "med", "high"))) %>%
+  ggplot(aes(x=perc_speeding, y=perc_alcohol, color=rank)) + geom_line() + 
+  geom_point(color="black", size=2) +
+  theme_gray() + scale_color_manual(values=c("red", "orange", "dark green")) + 
+  scale_x_continuous(breaks = seq(0,60,2)) + 
+  scale_y_continuous(breaks = seq(0,60,2)) +  
+  ggtitle("Comparing SAT Rank with Collisions Due to Alcohol and Speeding") + 
+  ylab("Percentage of Collisions due to Alcohol Impairment") +
+  xlab("Percentage of Collisions due to Speeding") + theme(legend.position="bottom")
+
+#Plot 2
+drivers_sat_cat %>% mutate(rank=factor(rank, levels=c("low", "med", "high"))) %>% 
+  mutate(driving=factor(driving, levels=c("bad", "okay", "good"))) %>%
+  ggplot(aes(x=driving, y=num_drivers, fill=rank))+
+  geom_bar(stat="summary", fun=mean, position="dodge") +
+  theme(axis.text.x = element_text(angle=45, hjust=1), legend.position="bottom") + 
+  scale_y_continuous(breaks = seq(0,25,2)) +
+  scale_fill_brewer(palette = "Greens") +
+  ggtitle("Comparing Driving Ability to Number of Drivers Involved in Collisions by SAT Score Rank") + 
+  xlab("Driving Ability") +
+  ylab("Number of Drivers Involved in Collisions per Billion Miles")
+
+```
+
+  The first plot maps the variables 'perc_speeding,' 'perc_alcohol,' and SAT 'rank' to look for associations between SAT scores and driving ability/decision making. The plot shows some points where 'high' ranking SAT scorers have a notably higher percentage of collisions due to alcohol impairment than the 'low' and 'med' scorers. However, there is one point amongst 'high' scorers that has a significantly lower percentage of collision due to alcohol impairment than the 'med' and 'low' scorers. The 'med' ranking SAT scorers stay relatively in between the 'high' and 'low' data points for both percentage levels. The 'low' ranking SAT scorers have some points at a larger percentage of collisions due to speeding than the 'high' and 'low' scorers.
+
+  The second plot maps the variables 'drivers,' 'num_drivers,' and 'rank' on a barplot, taking the mean of 'num_drivers' per 'drivers' and 'rank.' This plot shows that of the 'bad' drivers, 'med' SAT scorers have a much higher percentage of drivers involved in fatal collisions per billion miles than 'high' and 'low' SAT scorers while 'low' scorers have the lowest percentage. Of the 'okay' drivers, 'high' SAT scorers have the highest percentage while 'med' drivers have the lowest. Of the 'good' drivers, 'high' SAT scorers have the highest percentage while 'med' scorers have the lowest.
+
+---
+
+#Dimensionality Reduction
+```{r}
+#Processing data
+library(cluster)
+drivers_sat_pam1 <- drivers_sat %>% select_if(is.numeric) %>% scale
+
+#Choosing number of clusters (Silhouette Method)
+sil_width_ds1<-vector()
+for(i in 2:10){  
+  pam_fit_ds1 <- pam(drivers_sat_pam1, diss = TRUE, k = i)  
+  sil_width_ds1[i] <- pam_fit_ds1$silinfo$avg.width  
+}
+ggplot()+geom_line(aes(x=1:10,y=sil_width_ds1))+scale_x_continuous(name="k",breaks=1:10) 
+
+#PAM analysis
+pam_ds1 <-  drivers_sat %>% select_if(is.numeric) %>% scale %>% pam(k=2)
+pam_ds1
+
+drivers_sat %>% slice(pam_ds1$id.med)
+
+#Visualization
+pam_ds_vis1 <- drivers_sat %>% select_if(is.numeric) %>% mutate(cluster= as.factor(pam_ds1$clustering))
+
+library(GGally)
+ggpairs(pam_ds_vis1, columns=1:14, aes(color=cluster))
+
+  #Visualization of specific variables
+ggplot(pam_ds_vis1, aes(x=num_drivers,y=sat, color=cluster))+geom_point()
+ggplot(pam_ds_vis1, aes(x=num_drivers,y=frac, color=cluster))+geom_point()
+ggplot(pam_ds_vis1, aes(x=sat,y=frac, color=cluster))+geom_point()
+
+#Interpret clusters
+plot(pam_ds1,which=2)
+
+#Goodness of fit
+pam_ds1$silinfo$avg.width
+
+```
+  I performed PAM clustering on the numeric variables in my joined dataset. I chose the number of clusters to be 2 using the Silhouette Method because 2 had the highest width value. PAM clustering showed that IDs 16 and 29 (states Kansas and New Hampshire) are the most central points in each cluster and the representatives for each cluster. It shows how above or below the standard deviation each medoid is as well. 
+  Visualizing every possible variable with another using ggpairs, some more interesting clusters could be seen between 'num_drivers' and 'sat,' between 'num_drivers' and 'frac,' between 'frac' and 'sat,' which I plotted using ggplot. Plotting the 2 variables 'num_drivers' and 'sat' showed cluster 1 lying around 1000-1100 on the y-axis and cluster 2 lying around 850-1000 on the y-axis. Both clusters were spread evenly across the x-axis, showing that both clusters of higher and lower SAT scorers had a wide range of drivers involved in fatal collisions. Plotting the 2 variables 'num_drivers' and 'frac' showed cluster 1 lying around 20-80 on the y-axis and cluster 2 lying around 0-20 on the y-axis. Both clusters were spread evenly across the x-axis, showing that both clusters of eligible students taking the SAT had a wide range of drivers involved in fatal collisions. Plotting the 2 variables 'frac' and 'sat' showed cluster 1 condensed in the lower right region of the graph and cluster 2 spreading out more horizontally across the graph, with a general downward trend between the two variables. Cluster 1 shows that a lower percentage of eligible students who can take the SAT results in generally higher SAT scores while a higher percentage of eligible students who can take the SAT results in generally lower SAT scores. Analyzing goodness-of-fit with the average silhouette width of 0.22 shows that no substantial structure has been found. 
+  
+```{R, echo=F}
+sessionInfo(); Sys.time(); Sys.info()
+```

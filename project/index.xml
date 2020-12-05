@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Projects on My Website</title>
+    <link>/project/</link>
+    <description>Recent content in Projects on My Website</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Fri, 11 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="/project/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Project 1: Exploratory Data Analysis</title>
+      <link>/project/project1/</link>
+      <pubDate>Fri, 11 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/project/project1/</guid>
+      <description>Introduction I chose datasets &#39;bad_drivers&#39; and &#39;SAT&#39; to explore potential associations between driving abilities and intelligence. Do states with lower SAT scores have worse drivers? That&#39;s what I&#39;m going to find out! Dataset &#39;bad_drivers&#39; contains variables &#39;state,&#39; &#39;num_drivers&#39; (number of drivers involved in fatal collisions per billion miles), &#39;perc_speeding&#39; (percentage of drivers involved in fatal collisions who were speeding), &#39;perc_alcohol&#39; (percentage of drivers involved in fatal collisions who were alcohol-impaired), &#39;perc_not_distracted&#39; (percentage of drivers involved in fatal collisions who were not distracted), &#39;perc_no_previous&#39; (percentage of drivers involved in fatal collisions who had not been involved in any previous accidents), &#39;insurance_premiums&#39; (car insurance premiums (dollars)), and &#39;losses&#39; (losses incurred by insurance companies for collisions per insured driver (dollars)).</description>
+    </item>
+    
+    <item>
+      <title>Project 2: Modeling, Testing, and Predicting</title>
+      <link>/project/project2/</link>
+      <pubDate>Fri, 11 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/project/project2/</guid>
+      <description>Introduction The dataset I&#39;m working with has descriptors of the US Atlantic Hurricanes with the main variables &amp;quot;Name&amp;quot; (hurricane name), &amp;quot;Year&amp;quot; (hurricane year), &amp;quot;LF.WindsMPH&amp;quot; (maximum sustained windspeed), &amp;quot;LF.PressureMB&amp;quot; (atmospheric pressure at landfall), &amp;quot;firstLF&amp;quot; (date of first landfall), &amp;quot;BaseDamage&amp;quot; (property damage in millions of dollars), &amp;quot;deaths&amp;quot; (number of continental US deaths), and &amp;quot;mf&amp;quot; (gender of name). These variables measure the force of the hurricane, its affect on various states and people&#39;s lives, and its year of occurance and name.</description>
+    </item>
+    
+  </channel>
+</rss>
