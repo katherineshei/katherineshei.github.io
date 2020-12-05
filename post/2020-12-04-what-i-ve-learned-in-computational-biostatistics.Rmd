@@ -63,4 +63,4 @@ qplot(sparkle$price, sparkle$carat)
 
 qplot(sparkle$price, sparkle$depth)
 ```
-After looking through the data, you see that every price range of diamonds have a similar range of depths. You see that with an increase in price comes an increase in the carats, so you decide to go with something in the middle: a diamond with two carats. Your search is done, and you can now claim the title of Best Gift Giver and Best Friend. You're welcome!
+After looking through the data, you see that every price range of diamonds have a similar range of depths. You see that with an increase in price comes an increase in the carats, so you decide to go with something in the middle: a diamond with two carats. Your search is done, and you can now claim the title of 'Best Gift Giver and Best Friend'. You're welcome!

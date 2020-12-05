@@ -18,16 +18,5 @@ R and Python Can Talk to Each Other... You can use reticulate to use Python with
 This is an R code chunk. We&#39;re using an R code chunk, in an R session.</description>
     </item>
     
-    <item>
-      <title>Test Post</title>
-      <link>/post/2020/12/04/test-post/</link>
-      <pubDate>Fri, 04 Dec 2020 00:00:00 +0000</pubDate>
-      
-      <guid>/post/2020/12/04/test-post/</guid>
-      <description>   Hi, nice to meet you! My name is Katherine Shei.
-Some things about me... I love dancing and singing!
-quakes &amp;lt;- quakes r.quakes.mag.mean() ## 4.6204000000000001   </description>
-    </item>
-    
   </channel>
 </rss>
